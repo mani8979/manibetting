@@ -68,7 +68,6 @@ const AuthModal = ({ onClose, defaultView = 'login' }) => {
       } else {
         setError(data.message);
       }
-      }
     } catch (err) {
       console.error(err);
       setError(`Error: ${err.message}. Check VITE_API_URL on Vercel.`);
@@ -99,8 +98,9 @@ const AuthModal = ({ onClose, defaultView = 'login' }) => {
       } else {
         setError(data.message);
       }
-    } catch {
-      setError('Server error. Please try again.');
+    } catch (err) {
+      console.error(err);
+      setError(`Error: ${err.message}. Check VITE_API_URL on Vercel.`);
     }
     setIsLoading(false);
   };
@@ -132,8 +132,9 @@ const AuthModal = ({ onClose, defaultView = 'login' }) => {
       } else {
         setError(data.message);
       }
-    } catch {
-      setError('Server error. Please try again.');
+    } catch (err) {
+      console.error(err);
+      setError(`Error: ${err.message}. Check VITE_API_URL on Vercel.`);
     }
     setIsLoading(false);
   };
