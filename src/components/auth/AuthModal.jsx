@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { usePlayZone } from '../../context/PlayZoneContext';
+import { showToast } from '../../utils/toast';
 
 // Views: 'login' | 'register' | 'forgot-email' | 'forgot-otp' | 'forgot-reset'
 const AuthModal = ({ onClose, defaultView = 'login' }) => {
@@ -37,7 +38,11 @@ const AuthModal = ({ onClose, defaultView = 'login' }) => {
     e.preventDefault();
     setIsLoading(true); setError('');
     const result = await login(email, password);
-    if (result.success) { initUserSession(result.user); onClose(); }
+    if (result.success) { 
+      initUserSession(result.user); 
+      showToast(`Welcome back, ${result.user.name}!`);
+      onClose(); 
+    }
     else setError(result.message);
     setIsLoading(false);
   };
@@ -47,7 +52,11 @@ const AuthModal = ({ onClose, defaultView = 'login' }) => {
     setIsLoading(true); setError('');
     if (password !== confirmPassword) { setError('Passwords do not match'); setIsLoading(false); return; }
     const result = await register(name, email, password);
-    if (result.success) { initUserSession(result.user); onClose(); }
+    if (result.success) { 
+      initUserSession(result.user); 
+      showToast(`Welcome to PlayZone, ${result.user.name}!`);
+      onClose(); 
+    }
     else setError(result.message);
     setIsLoading(false);
   };
