@@ -5,6 +5,7 @@
   perspective: 1200px;
   z-index: 1;
   position: relative;
+  margin: 0 auto 2rem;
 }
 .dice-3d {
   width: 100%;
