@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mines - PlayZone</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/responsive.css">
+  <link rel="stylesheet" href="./css/animations.css">
+  <link rel="stylesheet" href="./css/games.css">
+  <style>
+    /* Specific Mines Layout */
+    .mines-stage {
+      padding: var(--space-xl) var(--space-md);
+    }
+    .mines-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      .mines-container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-md);
+    }.mine-tile {
+      aspect-ratio: 1;
+      background: var(--bg-card);
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--border-glass);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    
+    .mine-tile:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-secondary);
+      transform: translateY(-2px);
+    }
+    
+    .mine-tile.revealed {
+      cursor: default;
+      transform: scale(0.95);
+      box-shadow: none;
+    }
+    
+    .mine-tile.revealed.gem {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: var(--accent-success);
+      color: var(--accent-success);
+      animation: pulseCoin 0.5s ease;
+    }
+    
+    .mine-tile.revealed.bomb {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: var(--accent-danger);
+      color: var(--accent-danger);
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+    
+    .multiplier-display {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent-success);
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .select-dropdown {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 1.1rem;
+      width: 100%;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .select-dropdown:hover, .select-dropdown:focus {
+      border-color: var(--accent-primary);
+    }
+    .select-dropdown option {
+      background: var(--bg-dark);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="logo">PLAYZONE</div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+        <a href="games.html" class="nav-item active"><i class="fas fa-gamepad"></i> Games</a>
+        <a href="sports.html" class="nav-item"><i class="fas fa-futbol"></i> Sports Simulator</a>
+        <a href="leaderboard.html" class="nav-item"><i class="fas fa-trophy"></i> Leaderboard</a>
+        <a href="rewards.html" class="nav-item"><i class="fas fa-gift"></i> Rewards</a>
+        <a href="history.html" class="nav-item"><i class="fas fa-history"></i> History</a>
+        <a href="profile.html" class="nav-item"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <a href="games.html" class="btn btn-secondary" style="margin-right: auto;"><i class="fas fa-arrow-left"></i> Back</a>
+        <div class="wallet-display">
+          <i class="fas fa-coins"></i>
+          <span class="wallet-balance">0</span>
+        </div>
+      </div>
+      
+      <div class="game-area animate-fade-in">
+        
+        <div class="game-header">
+          <h2>MINES</h2>
+          <p>Find gems, avoid the mines!</p>
+          <div class="reward-badge" style="margin-top: 1rem; color: #ef4444; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3);">
+            <i class="fas fa-gem"></i> MULTIPLY YOUR VIRTUAL COINS
+          </div>
+        </div>
+        
+        <div class="game-stage mines-stage">
+          <div class="mines-grid" id="mines-grid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        
+        <div class="controls-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="control-group">
+            <span class="control-label">Virtual Coins</span>
+            <div class="coin-selector-main">
+              <button class="coin-btn" id="coin-minus"><i class="fas fa-minus"></i></button>
+              <input type="number" id="wager-amount" class="coin-input" value="100" min="10" step="10">
+              <button class="coin-btn" id="coin-plus"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="coin-presets">
+              <button class="preset-btn" data-val="25">25</button>
+              <button class="preset-btn" data-val="50">50</button>
+              <button class="preset-btn" data-val="100">100</button>
+              <button class="preset-btn" data-val="250">250</button>
+              <button class="preset-btn" data-val="500">500</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <span class="control-label">Number of Mines</span>
+            <select id="mines-count" class="select-dropdown">
+              <option value="1">1 Mine (Low Risk)</option>
+              <option value="3" selected>3 Mines (Medium Risk)</option>
+              <option value="5">5 Mines (High Risk)</option>
+              <option value="10">10 Mines (Extreme)</option>
+              <option value="15">15 Mines (Insane)</option>
+              <option value="24">24 Mines (Impossible)</option>
+            </select>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; width: 100%;">
+          <button id="start-btn" class="main-action-btn" style="background: linear-gradient(135deg, #ef4444, #b91c1c); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.25);">
+            <i class="fas fa-play"></i> Start Game
+          </button>
+          
+          <button id="cashout-btn" class="main-action-btn" style="display: none; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.25);">
+            <i class="fas fa-hand-holding-usd"></i> Cashout
+          </button>
+        </div>
+        
+        <div class="result-container" id="result-container">
+          <div id="particles"></div>
+          <div class="control-label" style="margin-bottom: 0.5rem;">Current Multiplier</div>
+          <div class="multiplier-display" id="multiplier-display">1.00x</div>
+          <div class="result-msg" id="result-msg">Profit: 0 COINS</div>
+        </div>
+        
+        <div class="bottom-info">
+          <div class="info-card" style="grid-column: span 2;">
+            <h3>Game Statistics</h3>
+            <div class="stats-grid">
+              <div class="stat-box">
+                <div class="stat-val" id="stat-played">0</div>
+                <div class="stat-lbl">Played</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-won">0</div>
+                <div class="stat-lbl">Wins</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-lost">0</div>
+                <div class="stat-lbl">Losses</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-rate">0%</div>
+                <div class="stat-lbl">Win Rate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </main>
+    
+    <nav class="mobile-nav">
+      <a href="index.html" class="mobile-nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="games.html" class="mobile-nav-item active">
+        <i class="fas fa-gamepad"></i>
+        <span>Games</span>
+      </a>
+      <a href="rewards.html" class="mobile-nav-item">
+        <i class="fas fa-gift"></i>
+        <span>Rewards</span>
+      </a>
+      <a href="leaderboard.html" class="mobile-nav-item">
+        <i class="fas fa-trophy"></i>
+        <span>Leaders</span>
+      </a>
+      <a href="profile.html" class="mobile-nav-item">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+  </div>
+    <script src="./js/storage.js"></script>
+  <script src="./js/wallet.js"></script>
+  <script src="./js/games.js"></script>
+  <script src="./js/app.js"></script>
+  <script src="./js/mines.js"></script>
+</body>
+</html>
+

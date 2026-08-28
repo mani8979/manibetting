@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - PlayZone</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./css/style.css?v=2">
+  <link rel="stylesheet" href="./css/responsive.css?v=2">
+  <link rel="stylesheet" href="./css/animations.css">
+  <style>
+    /* Premium Profile specific variables and overrides */
+    :root {
+      --violet: #7C5CFF;
+      --gold: #F5B83D;
+      --cyan: #22D3EE;
+      --green: #22C55E;
+      --red: #F43F5E;
+    }
+
+    body {
+      background: var(--bg-darker);
+    }
+
+    .profile-dashboard {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding-bottom: 2rem;
+    }
+
+    .profile-left-col, .profile-right-col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      width: 100%;
+    }
+
+    @media (min-width: 1024px) {
+      .profile-dashboard {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+      .profile-left-col {
+        width: 350px;
+        flex-shrink: 0;
+      }
+      .profile-right-col {
+        flex: 1;
+      }
+    }
+
+    .profile-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-glass);
+      padding: var(--space-lg);
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .profile-card:hover {
+      background: var(--bg-card-hover);
+    }
+
+    /* Section Headings */
+    .section-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title i {
+      color: var(--violet);
+    }
+
+    /* Identity Section */
+    .profile-identity {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .avatar-container {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .profile-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--bg-dark), var(--bg-card));
+      border: 2px solid var(--violet);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      box-shadow: 0 0 20px rgba(124,92,255,0.2);
+    }
+    
+    .status-dot {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 16px;
+      height: 16px;
+      background: var(--green);
+      border: 3px solid var(--bg-card);
+      border-radius: 50%;
+    }
+
+    .profile-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+    }
+
+    .profile-handle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .role-badge {
+      background: rgba(124,92,255,0.15);
+      border: 1px solid rgba(124,92,255,0.45);
+      color: #906FFF;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+
+    .edit-profile-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-glass);
+      color: var(--text-muted);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .edit-profile-btn:hover {
+      background: var(--violet);
+      color: white;
+      border-color: var(--violet);
+    }
+
+    /* Level System */
+    .level-summary {
+      background: linear-gradient(135deg, rgba(124,92,255,0.18), rgba(34,211,238,0.08));
+      border: 1px solid rgba(124,92,255,0.35);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    
+    .level-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    .xp-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-bar-container {
+      height: 8px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--violet);
+      border-radius: 4px;
+      width: 0%; /* Dynamic */
+      transition: width 1s ease-out;
+    }
+
+    .xp-remaining {
+      font-size: 0.75rem;
+      color: var(--violet);
+      font-weight: 700;
+    }
+
+    /* Virtual Coins */
+    .balance-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+    }
+    .balance-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .balance-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .balance-amount {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--gold);
+    }
+    .balance-today {
+      font-size: 0.85rem;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    /* Quick Stats 2x2 Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+    }
+    
+    .stat-box {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-glass);
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: background 0.2s ease;
+    }
+    .stat-box:hover {
+      background: var(--bg-card-hover);
+    }
+    
+    .stat-val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-lbl {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    /* Accent Colors for specific stats */
+    .stat-games .stat-val { color: var(--violet); }
+    .stat-wins .stat-val { color: var(--green); }
+    .stat-losses .stat-val { color: var(--red); }
+    .stat-rate .stat-val { color: var(--cyan); }
+
+    /* Performance Section */
+    .perf-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      font-size: 0.85rem;
+    }
+    .perf-name {
+      width: 100px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .perf-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 3px;
+      margin: 0 1rem;
+      overflow: hidden;
+    }
+    .perf-bar-fill {
+      height: 100%;
+      background: var(--cyan);
+      border-radius: 3px;
+    }
+    .perf-count {
+      width: 30px;
+      text-align: right;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    /* Recent Activity */
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .activity-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .activity-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .act-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .act-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    .act-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .act-game {
+      font-size: 0.9rem;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+    .act-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .act-amount {
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+    .act-amount.positive { color: var(--green); }
+    .act-amount.negative { color: var(--red); }
+    .act-amount.neutral { color: var(--text-muted); }
+
+    /* Achievements Grid */
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .achievement-card {
+      background: rgba(0,0,0,0.2);
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100px;
+      position: relative;
+      transition: transform 0.2s;
+    }
+    
+    .achievement-card.unlocked {
+      background: rgba(124,92,255,0.05);
+      border-color: rgba(124,92,255,0.3);
+    }
+    .achievement-card.unlocked:hover {
+      transform: scale(1.02);
+    }
+    
+    .ach-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-muted);
+      opacity: 0.5;
+    }
+    .achievement-card.unlocked .ach-icon {
+      color: var(--gold);
+      opacity: 1;
+    }
+    
+    .ach-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .achievement-card.unlocked .ach-title {
+      color: var(--text-main);
+    }
+
+    .ach-lock {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      opacity: 0.5;
+    }
+
+    /* Small Sections */
+    .flex-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+    }
+    
+    /* Edit Modal */
+    .edit-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 11, 26, 0.85);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .edit-modal.active { display: flex; }
+    
+    .edit-content {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      width: 90%;
+      max-width: 350px;
+      box-shadow: var(--shadow-glass);
+    }
+    
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    
+    .avatar-option {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      background: var(--bg-dark);
+      border: 2px solid transparent;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .avatar-option:hover {
+      transform: scale(1.1);
+      background: var(--bg-card-hover);
+    }
+    .avatar-option.selected {
+      border-color: var(--violet);
+      background: rgba(124,92,255,0.1);
+    }
+    
+    .edit-input {
+      width: 100%;
+      background: var(--bg-dark);
+      border: 1px solid var(--border-glass);
+      color: white;
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <aside class="sidebar">
+      <div class="logo">PLAYZONE</div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+        <a href="games.html" class="nav-item"><i class="fas fa-gamepad"></i> Games</a>
+        <a href="sports.html" class="nav-item"><i class="fas fa-futbol"></i> Sports Simulator</a>
+        <a href="leaderboard.html" class="nav-item"><i class="fas fa-trophy"></i> Leaderboard</a>
+        <a href="rewards.html" class="nav-item"><i class="fas fa-gift"></i> Rewards</a>
+        <a href="history.html" class="nav-item"><i class="fas fa-history"></i> History</a>
+        <a href="profile.html" class="nav-item active"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      
+      <div class="top-bar">
+        <div class="logo-mobile">PLAYZONE</div>
+        <div class="wallet-display" style="opacity: 0.5;">
+          <!-- Wallet is de-emphasized here since it's prominent in the profile -->
+          <i class="fas fa-coins"></i>
+          <span class="wallet-balance">0</span>
+        </div>
+      </div>
+      
+      <div class="profile-dashboard animate-fade-in">
+        
+        <!-- LEFT COLUMN (Mobile: Top) -->
+        <div class="profile-left-col">
+          
+          <!-- Identity Card -->
+          <div class="profile-card profile-identity">
+            <button class="edit-profile-btn" id="edit-btn"><i class="fas fa-pen"></i></button>
+            <div class="avatar-container">
+              <div class="profile-avatar" id="ui-avatar">🎮</div>
+              <div class="status-dot"></div>
+            </div>
+            <div class="profile-name" id="ui-username">Player</div>
+            <div class="profile-handle" id="ui-handle">@player</div>
+            <div class="role-badge" id="ui-level-badge">LEVEL 1</div>
+            
+            <div class="level-summary" style="width: 100%;">
+              <div class="level-title" id="ui-level-title">LEVEL 1</div>
+              <div class="xp-text" id="ui-xp-text">0 / 1000 XP</div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="ui-xp-bar"></div>
+              </div>
+              <div class="xp-remaining" id="ui-xp-remain">1000 XP to Level 2</div>
+            </div>
+          </div>
+          
+          <!-- Virtual Coin Summary -->
+          <div class="profile-card balance-card">
+            <div class="balance-info">
+              <div class="balance-title">Virtual Coins</div>
+              <div class="balance-amount"><span class="wallet-balance">0</span> 🪙</div>
+            </div>
+            <div class="balance-today" id="ui-coin-today">
+              <i class="fas fa-wallet"></i>
+            </div>
+          </div>
+          
+          <!-- Favorite Game -->
+          <div class="profile-card">
+            <div class="section-title"><i class="fas fa-heart" style="color: var(--violet);"></i> Favorite Game</div>
+            <div id="ui-fav-game" class="text-muted" style="text-align: center; font-size: 0.9rem; padding: 1rem 0;">
+              No games played yet.
+            </div>
+          </div>
+          
+          <!-- Streaks -->
+          <div class="profile-card">
+            <div class="section-title"><i class="fas fa-fire" style="color: var(--cyan);"></i> Win Streaks</div>
+            <div class="flex-section" style="margin-bottom: 0.5rem;">
+              <span class="text-muted" style="font-size: 0.85rem;">Current Streak</span>
+              <span style="font-weight: 800; color: var(--cyan);" id="ui-streak-curr">🔥 0 WINS</span>
+            </div>
+            <div class="flex-section">
+              <span class="text-muted" style="font-size: 0.85rem;">Best Streak</span>
+              <span style="font-weight: 800; color: var(--cyan);" id="ui-streak-best">🔥 0 WINS</span>
+            </div>
+          </div>
+          
+        </div>
+
+        <!-- RIGHT COLUMN (Mobile: Bottom) -->
+        <div class="profile-right-col">
+          
+          <!-- Quick Stats 2x2 -->
+          <div class="stats-grid">
+            <div class="stat-box stat-games">
+              <div class="stat-val" id="ui-stat-games">0</div>
+              <div class="stat-lbl">Games</div>
+            </div>
+            <div class="stat-box stat-wins">
+              <div class="stat-val" id="ui-stat-wins">0</div>
+              <div class="stat-lbl">Wins</div>
+            </div>
+            <div class="stat-box stat-losses">
+              <div class="stat-val" id="ui-stat-losses">0</div>
+              <div class="stat-lbl">Losses</div>
+            </div>
+            <div class="stat-box stat-rate">
+              <div class="stat-val" id="ui-stat-rate">0%</div>
+              <div class="stat-lbl">Win Rate</div>
+            </div>
+          </div>
+          
+          <!-- Game Performance & Coin Performance -->
+          <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+            <div class="profile-card">
+              <div class="section-title"><i class="fas fa-chart-bar" style="color: var(--cyan);"></i> Game Performance</div>
+              <div id="ui-perf-list">
+                <div class="empty-state" style="padding: 1rem 0;">No performance data.</div>
+              </div>
+            </div>
+            
+            <div class="profile-card">
+              <div class="section-title"><i class="fas fa-coins" style="color: var(--gold);"></i> Coin Performance</div>
+              <div class="flex-section" style="margin-bottom: 1rem;">
+                <span class="text-muted" style="font-size: 0.85rem;">Coins Earned</span>
+                <span style="font-weight: 800; color: var(--green);" id="ui-coin-earned">+0</span>
+              </div>
+              <div class="flex-section" style="margin-bottom: 1rem;">
+                <span class="text-muted" style="font-size: 0.85rem;">Coins Spent</span>
+                <span style="font-weight: 800; color: var(--red);" id="ui-coin-spent">-0</span>
+              </div>
+              <hr style="border-color: rgba(255,255,255,0.05); margin-bottom: 1rem;">
+              <div class="flex-section">
+                <span class="text-muted" style="font-size: 0.85rem; font-weight: 700;">Net Performance</span>
+                <span style="font-weight: 800; font-size: 1.1rem; color: var(--violet);" id="ui-coin-net">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Achievements -->
+          <div class="profile-card">
+            <div class="section-title"><i class="fas fa-medal" style="color: var(--gold);"></i> Achievements</div>
+            <div class="achievements-grid" id="ui-achievements">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+          
+          <!-- Recent Activity -->
+          <div class="profile-card">
+            <div class="section-title"><i class="fas fa-history" style="color: var(--text-muted);"></i> Recent Activity</div>
+            <div class="activity-list" id="ui-recent">
+              <div class="empty-state">No recent activity.</div>
+            </div>
+          </div>
+
+        </div>
+        
+      </div>
+      
+    </main>
+    
+    <nav class="mobile-nav">
+      <a href="index.html" class="mobile-nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="games.html" class="mobile-nav-item">
+        <i class="fas fa-gamepad"></i>
+        <span>Games</span>
+      </a>
+      <a href="rewards.html" class="mobile-nav-item">
+        <i class="fas fa-gift"></i>
+        <span>Rewards</span>
+      </a>
+      <a href="leaderboard.html" class="mobile-nav-item">
+        <i class="fas fa-trophy"></i>
+        <span>Leaders</span>
+      </a>
+      <a href="profile.html" class="mobile-nav-item active">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+    
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="edit-modal" id="edit-modal">
+    <div class="edit-content animate-pop-in">
+      <h3 style="margin-bottom: 1.5rem; text-align: center;">Edit Profile</h3>
+      
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Select Avatar</div>
+      <div class="avatar-grid" id="avatar-grid">
+        <div class="avatar-option selected">🎮</div>
+        <div class="avatar-option">🧑</div>
+        <div class="avatar-option">👾</div>
+        <div class="avatar-option">🦊</div>
+        <div class="avatar-option">🤖</div>
+        <div class="avatar-option">⭐</div>
+        <div class="avatar-option">👽</div>
+        <div class="avatar-option">👻</div>
+      </div>
+      
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Username</div>
+      <input type="text" id="edit-username" class="edit-input" placeholder="Player" maxlength="15">
+      
+      <div class="btn-group">
+        <button class="btn btn-secondary" id="edit-cancel" style="flex: 1;">Cancel</button>
+        <button class="btn btn-primary" id="edit-save" style="flex: 1;">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/storage.js"></script>
+  <script src="./js/wallet.js"></script>
+  <script src="./js/games.js"></script>
+  <script src="./js/app.js"></script>
+  <script src="./js/profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Guess - PlayZone</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/responsive.css">
+  <link rel="stylesheet" href="./css/animations.css">
+  <link rel="stylesheet" href="./css/games.css">
+  <style>
+    /* Specific Number Guess Layout */
+    .number-stage {
+      padding: 3rem var(--space-md);
+      text-align: center;
+    }
+    .number-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .guess-history {
+      margin-top: var(--space-xl);
+      padding: var(--space-lg) 0;
+      border-top: 1px solid var(--border-glass);
+    }
+    .num-btn {
+      background: var(--bg-card);
+      border: 2px solid var(--border-glass);
+      color: white;
+      font-size: 1.8rem;
+      font-weight: 800;
+      padding: 1.5rem 0;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .num-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      z-index: 1;
+    }
+    .num-btn span {
+      position: relative;
+      z-index: 2;
+    }
+    .num-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-secondary);
+      transform: translateY(-2px);
+    }
+    .num-btn.selected {
+      background: rgba(34, 211, 238, 0.2);
+      border-color: var(--accent-secondary);
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+      color: var(--accent-secondary);
+    }
+    .num-btn.winning {
+      background: var(--accent-success);
+      border-color: #059669;
+      color: white;
+      animation: pulseCoin 1s infinite;
+      box-shadow: 0 0 30px rgba(34, 197, 94, 0.6);
+    }
+    .num-btn.losing {
+      opacity: 0.3;
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="logo">PLAYZONE</div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+        <a href="games.html" class="nav-item active"><i class="fas fa-gamepad"></i> Games</a>
+        <a href="sports.html" class="nav-item"><i class="fas fa-futbol"></i> Sports Simulator</a>
+        <a href="leaderboard.html" class="nav-item"><i class="fas fa-trophy"></i> Leaderboard</a>
+        <a href="rewards.html" class="nav-item"><i class="fas fa-gift"></i> Rewards</a>
+        <a href="history.html" class="nav-item"><i class="fas fa-history"></i> History</a>
+        <a href="profile.html" class="nav-item"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <a href="games.html" class="btn btn-secondary" style="margin-right: auto;"><i class="fas fa-arrow-left"></i> Back</a>
+        <div class="wallet-display">
+          <i class="fas fa-coins"></i>
+          <span class="wallet-balance">0</span>
+        </div>
+      </div>
+      
+      <div class="game-area animate-fade-in">
+        
+        <div class="game-header">
+          <h2>NUMBER GUESS</h2>
+          <p>Pick a number between 1 and 10</p>
+          <div class="reward-badge" style="margin-top: 1rem; color: var(--accent-secondary); background: rgba(34, 211, 238, 0.1); border-color: rgba(34, 211, 238, 0.3);">
+            <i class="fas fa-bolt"></i> WIN 9× VIRTUAL COINS
+          </div>
+        </div>
+        
+        <div class="game-stage number-stage">
+          <div class="number-grid" id="number-grid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        
+        <div class="controls-grid" style="grid-template-columns: 1fr;">
+          <div class="control-group">
+            <span class="control-label">Virtual Coins</span>
+            <div class="coin-selector-main">
+              <button class="coin-btn" id="coin-minus"><i class="fas fa-minus"></i></button>
+              <input type="number" id="wager-amount" class="coin-input" value="100" min="10" step="10">
+              <button class="coin-btn" id="coin-plus"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="coin-presets">
+              <button class="preset-btn" data-val="25">25</button>
+              <button class="preset-btn" data-val="50">50</button>
+              <button class="preset-btn" data-val="100">100</button>
+              <button class="preset-btn" data-val="250">250</button>
+              <button class="preset-btn" data-val="500">500</button>
+            </div>
+          </div>
+        </div>
+        
+        <button id="guess-btn" class="main-action-btn" disabled style="background: linear-gradient(135deg, var(--accent-secondary), #0ea5e9); box-shadow: 0 8px 25px rgba(34, 211, 238, 0.25);">
+          <i class="fas fa-lock"></i> Lock In Guess
+        </button>
+        
+        <div class="result-container" id="result-container">
+          <div id="particles"></div>
+          <div class="control-label" style="margin-bottom: 0.5rem;">Result</div>
+          <div class="result-value" id="result-number">—</div>
+          <div class="result-msg" id="result-msg">Waiting for selection...</div>
+        </div>
+        
+        <div class="bottom-info">
+          <div class="info-card">
+            <h3>Recent Draws</h3>
+            <div class="recent-list" id="recent-list">
+              <!-- JS Populated -->
+            </div>
+          </div>
+          <div class="info-card">
+            <h3>Game Statistics</h3>
+            <div class="stats-grid">
+              <div class="stat-box">
+                <div class="stat-val" id="stat-played">0</div>
+                <div class="stat-lbl">Played</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-won">0</div>
+                <div class="stat-lbl">Wins</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-lost">0</div>
+                <div class="stat-lbl">Losses</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-rate">0%</div>
+                <div class="stat-lbl">Win Rate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </main>
+    
+    <nav class="mobile-nav">
+      <a href="index.html" class="mobile-nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="games.html" class="mobile-nav-item active">
+        <i class="fas fa-gamepad"></i>
+        <span>Games</span>
+      </a>
+      <a href="rewards.html" class="mobile-nav-item">
+        <i class="fas fa-gift"></i>
+        <span>Rewards</span>
+      </a>
+      <a href="leaderboard.html" class="mobile-nav-item">
+        <i class="fas fa-trophy"></i>
+        <span>Leaders</span>
+      </a>
+      <a href="profile.html" class="mobile-nav-item">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+  </div>
+    <script src="./js/storage.js"></script>
+  <script src="./js/wallet.js"></script>
+  <script src="./js/games.js"></script>
+  <script src="./js/app.js"></script>
+  <script src="./js/numberguess.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sports Simulator - PlayZone</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/responsive.css">
+  <link rel="stylesheet" href="./css/animations.css">
+  <link rel="stylesheet" href="./css/games.css">
+  <style>
+    /* Specific Sports Layout */
+    .sports-stage {
+      padding: var(--space-xl) var(--space-md);
+    }
+    .matches-container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .match-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .match-card:hover {
+      border-color: var(--accent-secondary);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    
+    .match-header {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-glass);
+      padding-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .teams-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+    
+    .team {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+    }
+    
+    .team-logo {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+      border: 2px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--text-muted);
+    }
+    
+    .team-name {
+      font-weight: 800;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+    
+    .vs {
+      font-weight: 800;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      opacity: 0.5;
+    }
+    
+    .odds-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .odd-btn {
+      background: var(--bg-darker);
+      border: 1px solid var(--border-glass);
+      color: white;
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .odd-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+    }
+    
+    .odd-btn.selected {
+      background: rgba(34, 211, 238, 0.1);
+      border-color: var(--accent-secondary);
+      box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+    }
+    
+    .odd-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    
+    .odd-btn.selected .odd-label {
+      color: var(--accent-secondary);
+      font-weight: 700;
+    }
+    
+    .odd-value {
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+    
+    .action-area {
+      margin-top: 1.5rem;
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      justify-content: flex-end;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-glass);
+    }
+    
+    /* Result Modal */
+    .sim-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(7, 11, 26, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .sim-modal.active { display: flex; }
+    
+    .sim-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 3rem 2rem;
+      text-align: center;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    
+    .sim-loader {
+      font-size: 4rem;
+      color: var(--accent-secondary);
+      margin-bottom: 1.5rem;
+    }
+    
+    .match-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    @media (max-width: 480px) {
+      .odds-container {
+        grid-template-columns: 1fr;
+      }
+      .action-area {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .action-area .main-action-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="logo">PLAYZONE</div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+        <a href="games.html" class="nav-item"><i class="fas fa-gamepad"></i> Games</a>
+        <a href="sports.html" class="nav-item active"><i class="fas fa-futbol"></i> Sports Simulator</a>
+        <a href="leaderboard.html" class="nav-item"><i class="fas fa-trophy"></i> Leaderboard</a>
+        <a href="rewards.html" class="nav-item"><i class="fas fa-gift"></i> Rewards</a>
+        <a href="history.html" class="nav-item"><i class="fas fa-history"></i> History</a>
+        <a href="profile.html" class="nav-item"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <a href="games.html" class="btn btn-secondary" style="margin-right: auto;"><i class="fas fa-arrow-left"></i> Back</a>
+        <div class="wallet-display">
+          <i class="fas fa-coins"></i>
+          <span class="wallet-balance">0</span>
+        </div>
+      </div>
+      
+      <div class="game-area animate-fade-in">
+        
+        <div class="game-header">
+          <h2>SPORTS SIMULATOR</h2>
+          <p>Predict outcomes of simulated virtual matches</p>
+          <div class="reward-badge" style="margin-top: 1rem; color: #10b981; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">
+            <i class="fas fa-chart-line"></i> DYNAMIC ODDS
+          </div>
+        </div>
+        
+        <div class="game-stage sports-stage">
+          <div class="matches-container" id="matches-container">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        
+        <div class="bottom-info">
+          <div class="info-card" style="grid-column: span 2;">
+            <h3>Prediction Statistics</h3>
+            <div class="stats-grid">
+              <div class="stat-box">
+                <div class="stat-val" id="stat-played">0</div>
+                <div class="stat-lbl">Predictions</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-won">0</div>
+                <div class="stat-lbl">Correct</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-lost">0</div>
+                <div class="stat-lbl">Wrong</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-rate">0%</div>
+                <div class="stat-lbl">Accuracy</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </main>
+    
+    <nav class="mobile-nav">
+      <a href="index.html" class="mobile-nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="games.html" class="mobile-nav-item">
+        <i class="fas fa-gamepad"></i>
+        <span>Games</span>
+      </a>
+      <a href="sports.html" class="nav-item active"><i class="fas fa-futbol"></i>
+        <span>Sports</span>
+      </a>
+      <a href="rewards.html" class="mobile-nav-item">
+        <i class="fas fa-gift"></i>
+        <span>Rewards</span>
+      </a>
+      <a href="profile.html" class="mobile-nav-item">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+  </div>
+  
+  <div class="sim-modal" id="sim-modal">
+    <div class="sim-content animate-pop-in">
+      <div class="sim-loader">
+        <i class="fas fa-circle-notch fa-spin"></i>
+      </div>
+      <h3 id="sim-title" style="font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Simulating Match...</h3>
+      <p class="text-muted" id="sim-desc" style="margin: 1rem 0;">Calculating possession, shots, and goals...</p>
+      
+      <div id="sim-particles" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; z-index: -1;"></div>
+      
+      <div id="sim-result" style="font-size: 2rem; font-weight: 800; margin: 1.5rem 0; display: none; line-height: 1.2;"></div>
+      
+      <button class="main-action-btn" id="sim-close" style="display: none; background: var(--bg-darker); margin-top: 1.5rem;">Close Result</button>
+    </div>
+  </div>
+  
+    <script src="./js/storage.js"></script>
+  <script src="./js/wallet.js"></script>
+  <script src="./js/games.js"></script>
+  <script src="./js/app.js"></script>
+  <script src="./js/sports.js"></script>
+</body>
+</html>
+

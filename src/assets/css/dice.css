@@ -1,0 +1,95 @@
+/* 3D Dice Overrides for New Size */
+.dice-scene {
+  width: 160px;
+  height: 160px;
+  perspective: 1200px;
+  z-index: 1;
+  position: relative;
+}
+.dice-3d {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(15deg) rotateY(15deg);
+}
+.dice-face {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  border: 3px solid #cbd5e1;
+  border-radius: 20px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 0 8px rgba(0,0,0,0.2);
+  display: grid;
+  padding: 25px;
+  box-sizing: border-box;
+  grid-template-areas:
+    "a . c"
+    "d e f"
+    "g . i";
+}
+.face-1 { transform: rotateY(0deg) translateZ(80px); }
+.face-2 { transform: rotateY(180deg) translateZ(80px); }
+.face-3 { transform: rotateY(90deg) translateZ(80px); }
+.face-4 { transform: rotateY(-90deg) translateZ(80px); }
+.face-5 { transform: rotateX(90deg) translateZ(80px); }
+.face-6 { transform: rotateX(-90deg) translateZ(80px); }
+
+.dot {
+  display: block;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #0f172a;
+  box-shadow: inset 0 4px 6px rgba(0,0,0,0.6);
+  justify-self: center;
+  align-self: center;
+}
+
+.face-1 .dot { grid-area: e; background: #ef4444; }
+.face-2 .dot:nth-child(1) { grid-area: a; }
+.face-2 .dot:nth-child(2) { grid-area: i; }
+.face-3 .dot:nth-child(1) { grid-area: a; }
+.face-3 .dot:nth-child(2) { grid-area: e; }
+.face-3 .dot:nth-child(3) { grid-area: i; }
+.face-4 .dot:nth-child(1) { grid-area: a; }
+.face-4 .dot:nth-child(2) { grid-area: c; }
+.face-4 .dot:nth-child(3) { grid-area: g; }
+.face-4 .dot:nth-child(4) { grid-area: i; }
+.face-5 .dot:nth-child(1) { grid-area: a; }
+.face-5 .dot:nth-child(2) { grid-area: c; }
+.face-5 .dot:nth-child(3) { grid-area: e; }
+.face-5 .dot:nth-child(4) { grid-area: g; }
+.face-5 .dot:nth-child(5) { grid-area: i; }
+.face-6 .dot:nth-child(1) { grid-area: a; }
+.face-6 .dot:nth-child(2) { grid-area: c; }
+.face-6 .dot:nth-child(3) { grid-area: d; }
+.face-6 .dot:nth-child(4) { grid-area: f; }
+.face-6 .dot:nth-child(5) { grid-area: g; }
+.face-6 .dot:nth-child(6) { grid-area: i; }
+
+@keyframes rollShake {
+  0% { transform: translate(0, 0) rotateX(0) rotateY(0); }
+  10% { transform: translate(-5px, -5px) rotateX(20deg) rotateY(40deg); }
+  20% { transform: translate(5px, 5px) rotateX(-20deg) rotateY(80deg); }
+  30% { transform: translate(-5px, 5px) rotateX(40deg) rotateY(120deg); }
+  40% { transform: translate(5px, -5px) rotateX(-40deg) rotateY(160deg); }
+  50% { transform: translate(0, -10px) rotateX(60deg) rotateY(200deg); }
+  60% { transform: translate(0, -15px) rotateX(-60deg) rotateY(240deg); }
+  70% { transform: translate(0, -5px) rotateX(80deg) rotateY(280deg); }
+  80% { transform: translate(0, 0) rotateX(-80deg) rotateY(320deg); }
+  100% { transform: translate(0, 0) rotateX(0) rotateY(360deg); }
+}
+.animating-roll {
+  animation: rollShake 1s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes diceBounce {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0); }
+}
+.dice-bounce {
+  animation: diceBounce 0.3s ease-out;
+}

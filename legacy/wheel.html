@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lucky Wheel - PlayZone</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/responsive.css">
+  <link rel="stylesheet" href="./css/animations.css">
+  <link rel="stylesheet" href="./css/games.css">
+  <style>
+    /* Wheel Stage Specifics */
+    .wheel-stage {
+      margin: var(--space-xl) auto;
+      padding: 4rem var(--space-md);
+    }
+    .wheel-wrapper {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin: 0 auto;
+    }
+    @media (min-width: 768px) {
+      .wheel-wrapper { width: 340px; height: 340px; }
+    }
+    
+    .wheel-pointer {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 3rem;
+      color: var(--accent-gold);
+      z-index: 10;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 8px solid var(--bg-card-hover);
+      box-shadow: var(--shadow-glow);
+      position: relative;
+      overflow: hidden;
+      transition: transform 4s cubic-bezier(0.1, 0.7, 0.1, 1);
+    }
+    
+    /* Segment drawing using conic-gradient */
+    .wheel-bg {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(from 90deg,
+        var(--accent-danger) 0deg 45deg,
+        var(--accent-gold) 45deg 90deg,
+        var(--accent-success) 90deg 135deg,
+        var(--accent-primary) 135deg 180deg,
+        var(--accent-secondary) 180deg 225deg,
+        #ec4899 225deg 270deg,
+        #1B2945 270deg 315deg,
+        #906FFF 315deg 360deg
+      );
+    }
+    
+    .wheel-labels {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0; left: 0;
+    }
+    
+    .wheel-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 50%;
+      height: 20px;
+      margin-top: -10px;
+      transform-origin: 0% 50%;
+      text-align: right;
+      padding-right: 15px;
+      font-weight: 800;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      font-size: 1rem;
+    }
+    
+    /* 8 segments: 360/8 = 45 degrees per segment. 
+       Center of segment 1 (0-45) is 22.5deg */
+    .lbl-1 { transform: rotate(22.5deg); }
+    .lbl-2 { transform: rotate(67.5deg); }
+    .lbl-3 { transform: rotate(112.5deg); }
+    .lbl-4 { transform: rotate(157.5deg); }
+    .lbl-5 { transform: rotate(202.5deg); }
+    .lbl-6 { transform: rotate(247.5deg); }
+    .lbl-7 { transform: rotate(292.5deg); }
+    .lbl-8 { transform: rotate(337.5deg); }
+    
+    .wheel-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px; height: 40px;
+      background: var(--bg-dark);
+      border-radius: 50%;
+      border: 3px solid white;
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="logo">PLAYZONE</div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+        <a href="games.html" class="nav-item active"><i class="fas fa-gamepad"></i> Games</a>
+        <a href="sports.html" class="nav-item"><i class="fas fa-futbol"></i> Sports Simulator</a>
+        <a href="leaderboard.html" class="nav-item"><i class="fas fa-trophy"></i> Leaderboard</a>
+        <a href="rewards.html" class="nav-item"><i class="fas fa-gift"></i> Rewards</a>
+        <a href="history.html" class="nav-item"><i class="fas fa-history"></i> History</a>
+        <a href="profile.html" class="nav-item"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <a href="games.html" class="btn btn-secondary" style="margin-right: auto;"><i class="fas fa-arrow-left"></i> Back</a>
+        <div class="wallet-display">
+          <i class="fas fa-coins"></i>
+          <span class="wallet-balance">0</span>
+        </div>
+      </div>
+      
+      <div class="game-area animate-fade-in">
+        
+        <div class="game-header">
+          <h2>LUCKY WHEEL</h2>
+          <p>Spin the wheel for virtual rewards</p>
+          <div class="reward-badge" style="margin-top: 1rem; color: var(--accent-gold); background: rgba(245, 184, 61, 0.1); border-color: rgba(245, 184, 61, 0.3);">
+            <i class="fas fa-star"></i> WIN UP TO 10× COINS
+          </div>
+        </div>
+        
+        <div class="game-stage wheel-stage">
+          <div class="wheel-wrapper">
+            <i class="fas fa-caret-down wheel-pointer"></i>
+            <div class="wheel" id="wheel">
+              <div class="wheel-bg"></div>
+              <div class="wheel-labels">
+                <!-- Labels centered in their 45deg slices -->
+                <div class="wheel-label lbl-1">0x</div>
+                <div class="wheel-label lbl-2">1.5x</div>
+                <div class="wheel-label lbl-3">0x</div>
+                <div class="wheel-label lbl-4">2x</div>
+                <div class="wheel-label lbl-5">0.5x</div>
+                <div class="wheel-label lbl-6">3x</div>
+                <div class="wheel-label lbl-7">0x</div>
+                <div class="wheel-label lbl-8">10x</div>
+              </div>
+              <div class="wheel-center"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="controls-grid" style="grid-template-columns: 1fr;">
+          <div class="control-group">
+            <span class="control-label">Virtual Coins</span>
+            <div class="coin-selector-main">
+              <button class="coin-btn" id="coin-minus"><i class="fas fa-minus"></i></button>
+              <input type="number" id="wager-amount" class="coin-input" value="100" min="10" step="10">
+              <button class="coin-btn" id="coin-plus"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="coin-presets">
+              <button class="preset-btn" data-val="25">25</button>
+              <button class="preset-btn" data-val="50">50</button>
+              <button class="preset-btn" data-val="100">100</button>
+              <button class="preset-btn" data-val="250">250</button>
+              <button class="preset-btn" data-val="500">500</button>
+            </div>
+          </div>
+        </div>
+        
+        <button id="spin-btn" class="main-action-btn" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); box-shadow: 0 8px 25px rgba(245, 184, 61, 0.25);">
+          <i class="fas fa-sync-alt"></i> Spin Wheel
+        </button>
+        
+        <div class="result-container" id="result-container">
+          <div id="particles"></div>
+          <div class="control-label" style="margin-bottom: 0.5rem;">Result</div>
+          <div class="result-value" id="result-number">—</div>
+          <div class="result-msg" id="result-msg">Waiting for spin...</div>
+        </div>
+        
+        <div class="bottom-info">
+          <div class="info-card">
+            <h3>Recent Spins</h3>
+            <div class="recent-list" id="recent-list">
+              <!-- JS Populated -->
+            </div>
+          </div>
+          <div class="info-card">
+            <h3>Game Statistics</h3>
+            <div class="stats-grid">
+              <div class="stat-box">
+                <div class="stat-val" id="stat-played">0</div>
+                <div class="stat-lbl">Spins</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-won">0</div>
+                <div class="stat-lbl">Wins</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-lost">0</div>
+                <div class="stat-lbl">Losses</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-rate">0%</div>
+                <div class="stat-lbl">Win Rate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </main>
+    
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+      <a href="index.html" class="mobile-nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="games.html" class="mobile-nav-item active">
+        <i class="fas fa-gamepad"></i>
+        <span>Games</span>
+      </a>
+      <a href="rewards.html" class="mobile-nav-item">
+        <i class="fas fa-gift"></i>
+        <span>Rewards</span>
+      </a>
+      <a href="leaderboard.html" class="mobile-nav-item">
+        <i class="fas fa-trophy"></i>
+        <span>Leaders</span>
+      </a>
+      <a href="profile.html" class="mobile-nav-item">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+    
+  </div>
+    <script src="./js/storage.js"></script>
+  <script src="./js/wallet.js"></script>
+  <script src="./js/games.js"></script>
+  <script src="./js/app.js"></script>
+  <script src="./js/wheel.js"></script>
+</body>
+</html>
+

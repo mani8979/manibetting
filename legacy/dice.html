@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dice Roll - PlayZone</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./css/style.css?v=2">
+  <link rel="stylesheet" href="./css/responsive.css?v=2">
+  <link rel="stylesheet" href="./css/animations.css">
+  <link rel="stylesheet" href="./css/games.css?v=2">
+  <style>
+    /* 3D Dice Overrides for New Size */
+    .dice-scene {
+      width: 160px;
+      height: 160px;
+      perspective: 1200px;
+      z-index: 1;
+      position: relative;
+    }
+    .dice-3d {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateX(15deg) rotateY(15deg);
+    }
+    .dice-face {
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      border: 3px solid #cbd5e1;
+      border-radius: 20px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 0 8px rgba(0,0,0,0.2);
+      display: grid;
+      padding: 25px;
+      box-sizing: border-box;
+      grid-template-areas:
+        "a . c"
+        "d e f"
+        "g . i";
+    }
+    .face-1 { transform: rotateY(0deg) translateZ(80px); }
+    .face-2 { transform: rotateY(180deg) translateZ(80px); }
+    .face-3 { transform: rotateY(90deg) translateZ(80px); }
+    .face-4 { transform: rotateY(-90deg) translateZ(80px); }
+    .face-5 { transform: rotateX(90deg) translateZ(80px); }
+    .face-6 { transform: rotateX(-90deg) translateZ(80px); }
+    
+    .dot {
+      display: block;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #0f172a;
+      box-shadow: inset 0 4px 6px rgba(0,0,0,0.6);
+      justify-self: center;
+      align-self: center;
+    }
+    
+    .face-1 .dot { grid-area: e; background: #ef4444; }
+    .face-2 .dot:nth-child(1) { grid-area: a; }
+    .face-2 .dot:nth-child(2) { grid-area: i; }
+    .face-3 .dot:nth-child(1) { grid-area: a; }
+    .face-3 .dot:nth-child(2) { grid-area: e; }
+    .face-3 .dot:nth-child(3) { grid-area: i; }
+    .face-4 .dot:nth-child(1) { grid-area: a; }
+    .face-4 .dot:nth-child(2) { grid-area: c; }
+    .face-4 .dot:nth-child(3) { grid-area: g; }
+    .face-4 .dot:nth-child(4) { grid-area: i; }
+    .face-5 .dot:nth-child(1) { grid-area: a; }
+    .face-5 .dot:nth-child(2) { grid-area: c; }
+    .face-5 .dot:nth-child(3) { grid-area: e; }
+    .face-5 .dot:nth-child(4) { grid-area: g; }
+    .face-5 .dot:nth-child(5) { grid-area: i; }
+    .face-6 .dot:nth-child(1) { grid-area: a; }
+    .face-6 .dot:nth-child(2) { grid-area: c; }
+    .face-6 .dot:nth-child(3) { grid-area: d; }
+    .face-6 .dot:nth-child(4) { grid-area: f; }
+    .face-6 .dot:nth-child(5) { grid-area: g; }
+    .face-6 .dot:nth-child(6) { grid-area: i; }
+    
+    @keyframes rollShake {
+      0% { transform: translate(0, 0) rotateX(0) rotateY(0); }
+      10% { transform: translate(-5px, -5px) rotateX(20deg) rotateY(40deg); }
+      20% { transform: translate(5px, 5px) rotateX(-20deg) rotateY(80deg); }
+      30% { transform: translate(-5px, 5px) rotateX(40deg) rotateY(120deg); }
+      40% { transform: translate(5px, -5px) rotateX(-40deg) rotateY(160deg); }
+      50% { transform: translate(0, -10px) rotateX(60deg) rotateY(200deg); }
+      60% { transform: translate(0, -15px) rotateX(-60deg) rotateY(240deg); }
+      70% { transform: translate(0, -5px) rotateX(80deg) rotateY(280deg); }
+      80% { transform: translate(0, 0) rotateX(-80deg) rotateY(320deg); }
+      100% { transform: translate(0, 0) rotateX(0) rotateY(360deg); }
+    }
+    .animating-roll {
+      animation: rollShake 1s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    }
+    
+    @keyframes diceBounce {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0); }
+    }
+    .dice-bounce {
+      animation: diceBounce 0.3s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="logo">PLAYZONE</div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+        <a href="games.html" class="nav-item active"><i class="fas fa-gamepad"></i> Games</a>
+        <a href="sports.html" class="nav-item"><i class="fas fa-futbol"></i> Sports Simulator</a>
+        <a href="leaderboard.html" class="nav-item"><i class="fas fa-trophy"></i> Leaderboard</a>
+        <a href="rewards.html" class="nav-item"><i class="fas fa-gift"></i> Rewards</a>
+        <a href="history.html" class="nav-item"><i class="fas fa-history"></i> History</a>
+        <a href="profile.html" class="nav-item"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="top-bar">
+        <a href="games.html" class="btn btn-secondary" style="margin-right: auto;"><i class="fas fa-arrow-left"></i> Back</a>
+        <div class="wallet-display">
+          <i class="fas fa-coins"></i>
+          <span class="wallet-balance">0</span>
+        </div>
+      </div>
+      
+      <div class="game-area animate-fade-in">
+        
+        <div class="game-header">
+          <h2>DICE ROLL</h2>
+          <p>Test your luck and roll the perfect number</p>
+          <div class="reward-badge" style="margin-top: 1rem;">
+            <i class="fas fa-bolt"></i> WIN 2× VIRTUAL COINS
+          </div>
+        </div>
+        
+        <!-- Centerpiece Dice Stage -->
+        <div class="dice-stage" id="dice-stage">
+          <div class="dice-scene">
+            <div class="dice-3d" id="dice-3d">
+              <div class="dice-face face-1"><span class="dot"></span></div>
+              <div class="dice-face face-2"><span class="dot"></span><span class="dot"></span></div>
+              <div class="dice-face face-3"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+              <div class="dice-face face-4"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+              <div class="dice-face face-5"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+              <div class="dice-face face-6"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="controls-grid">
+          <!-- Prediction -->
+          <div class="control-group">
+            <span class="control-label">Choose Your Number</span>
+            <div class="prediction-options" id="prediction-options">
+              <button class="pred-btn" data-val="4">4</button>
+              <button class="pred-btn" data-val="5">5</button>
+              <button class="pred-btn" data-val="6">6</button>
+            </div>
+          </div>
+          
+          <!-- Wager -->
+          <div class="control-group">
+            <span class="control-label">Virtual Coins</span>
+            <div class="coin-selector-main">
+              <button class="coin-btn" id="coin-minus"><i class="fas fa-minus"></i></button>
+              <input type="number" id="wager-amount" class="coin-input" value="100" min="10" step="10">
+              <button class="coin-btn" id="coin-plus"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="coin-presets">
+              <button class="preset-btn" data-val="25">25</button>
+              <button class="preset-btn" data-val="50">50</button>
+              <button class="preset-btn" data-val="100">100</button>
+              <button class="preset-btn" data-val="250">250</button>
+              <button class="preset-btn" data-val="500">500</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Main CTA -->
+        <button id="roll-btn" class="main-roll-btn">
+          <i class="fas fa-dice"></i> Roll Dice
+        </button>
+        
+        <!-- Result Display -->
+        <div class="result-container" id="result-container">
+          <div id="particles"></div>
+          <div class="control-label" style="margin-bottom: 0.5rem;">Result</div>
+          <div class="result-value" id="result-number">—</div>
+          <div class="result-msg" id="result-msg">Waiting for roll...</div>
+        </div>
+        
+        <!-- Bottom Info -->
+        <div class="bottom-info">
+          <div class="info-card">
+            <h3>Recent Results</h3>
+            <div class="recent-list" id="recent-list">
+              <!-- JS Populated -->
+            </div>
+          </div>
+          <div class="info-card">
+            <h3>Game Statistics</h3>
+            <div class="stats-grid">
+              <div class="stat-box">
+                <div class="stat-val" id="stat-played">0</div>
+                <div class="stat-lbl">Played</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-won">0</div>
+                <div class="stat-lbl">Wins</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-lost">0</div>
+                <div class="stat-lbl">Losses</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-rate">0%</div>
+                <div class="stat-lbl">Win Rate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </main>
+    
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+      <a href="index.html" class="mobile-nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="games.html" class="mobile-nav-item active">
+        <i class="fas fa-gamepad"></i>
+        <span>Games</span>
+      </a>
+      <a href="rewards.html" class="mobile-nav-item">
+        <i class="fas fa-gift"></i>
+        <span>Rewards</span>
+      </a>
+      <a href="leaderboard.html" class="mobile-nav-item">
+        <i class="fas fa-trophy"></i>
+        <span>Leaders</span>
+      </a>
+      <a href="profile.html" class="mobile-nav-item">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+    
+  </div>
+  
+  <script src="./js/storage.js"></script>
+  <script src="./js/wallet.js"></script>
+  <script src="./js/games.js"></script>
+  <script src="./js/app.js"></script>
+  <script src="./js/dice.js"></script>
+</body>
+</html>
