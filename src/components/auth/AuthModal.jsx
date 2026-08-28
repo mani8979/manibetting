@@ -57,7 +57,7 @@ const AuthModal = ({ onClose, defaultView = 'login' }) => {
     e.preventDefault();
     setIsLoading(true); setError(''); setSuccessMsg('');
     try {
-      const res = await fetch('/api/auth/send-otp', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -85,7 +85,7 @@ const AuthModal = ({ onClose, defaultView = 'login' }) => {
     
     setIsLoading(true); setError('');
     try {
-      const res = await fetch('/api/auth/verify-otp', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp: otpString }),
@@ -113,7 +113,7 @@ const AuthModal = ({ onClose, defaultView = 'login' }) => {
         return; 
     }
     try {
-      const res = await fetch('/api/auth/reset-password', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/reset-password`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ resetToken, password }),
