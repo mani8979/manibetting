@@ -4,8 +4,7 @@
 }
 .coin-container {
   perspective: 1000px;
-  margin: 0 auto;
-  padding: 4rem var(--space-md);
+  margin: 4rem auto;
   text-align: center;
   width: 160px;
   height: 160px;
