@@ -19,6 +19,9 @@ const sendEmail = async (options) => {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS
     },
+    connectionTimeout: 5000,
+    greetingTimeout: 5000,
+    socketTimeout: 5000,
     tls: {
       rejectUnauthorized: false // needed for some Gmail configs
     }
