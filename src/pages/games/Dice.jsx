@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { usePlayZone } from '../../context/PlayZoneContext';
+import { useAuth } from '../../context/AuthContext';
 import TopBar from '../../components/layout/TopBar';
+import AuthModal from '../../components/auth/AuthModal';
 
 const faceRotations = {
   1: { x: 0, y: 0 },
@@ -14,6 +16,8 @@ const faceRotations = {
 
 const Dice = () => {
   const { balance, updateBalance } = usePlayZone();
+  const { user } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
   
   const [wager, setWager] = useState(100);
   const [selectedPrediction, setSelectedPrediction] = useState(null);
@@ -57,6 +61,11 @@ const Dice = () => {
   const handleRoll = () => {
     if (isRolling) return;
     
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+
     if (!selectedPrediction) {
       alert('Please select a prediction (4, 5, or 6)');
       return;
@@ -256,7 +265,9 @@ const Dice = () => {
           </div>
         </div>
         
+        
       </div>
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
     </div>
   );
 };

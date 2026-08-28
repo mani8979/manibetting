@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { usePlayZone } from '../../context/PlayZoneContext';
+import { useAuth } from '../../context/AuthContext';
 import TopBar from '../../components/layout/TopBar';
+import AuthModal from '../../components/auth/AuthModal';
 
 const Coinflip = () => {
   const { balance, updateBalance } = usePlayZone();
+  const { user } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
   
   const [wager, setWager] = useState(100);
   const [selectedPrediction, setSelectedPrediction] = useState('heads'); // 'heads' or 'tails'
@@ -45,6 +49,11 @@ const Coinflip = () => {
   const handleFlip = () => {
     if (isRolling) return;
     
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+
     if (isNaN(wager) || wager <= 0 || wager > balance) {
       alert('Invalid wager amount or insufficient funds.');
       return;
@@ -226,7 +235,9 @@ const Coinflip = () => {
           </div>
         </div>
         
+        
       </div>
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
     </div>
   );
 };
