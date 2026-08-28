@@ -96,7 +96,6 @@ ul {
   flex: 1;
   margin-left: var(--sidebar-width);
   padding: 2rem;
-  max-width: 1440px;
   width: calc(100% - var(--sidebar-width));
 }
 
