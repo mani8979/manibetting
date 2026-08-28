@@ -34,7 +34,7 @@ const Sidebar = () => {
                 />
                 <div style={{ overflow: 'hidden' }}>
                   <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--accent-gold)' }}><i className="fas fa-rupee-sign"></i> {(user.balance || 0).toFixed(2)}</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--accent-gold)' }}><i className="fas fa-rupee-sign"></i> {(balance || 0).toFixed(2)}</div>
                 </div>
               </div>
               <button
